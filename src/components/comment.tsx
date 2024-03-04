@@ -1,26 +1,29 @@
-import Avatar from "../assets/images/avatars/image-amyrobson.png";
-import ActionButton from "./action.button";
+import { CommentDataType } from "../App";
+import CommentFooter from "./comment.footer";
+import CommentHeader from "./comment.header";
+import Score from "./score";
 
-const Comment = () => {
+type PropsType = {
+  data: CommentDataType;
+};
+
+const Comment = ({ data }: PropsType) => {
   return (
-    <article className="flex gap-[25px] w-[730px] h-[167px] bg-[#FFFFFF] p-[24px] rounded-[8px]">
-      <div>+/12/-</div>
-      <div className="flex flex-col gap-[20px]">
-        <div className="w-full flex justify-between">
-          <div className="flex items-center gap-[10px]">
-            <img src={Avatar} className="size-[32px]" />
-            <h2 className="text-[#334253] text-[16px]">ambrosyn</h2>
-            <span>1 month ago</span>
-          </div>
-          <ActionButton type="reply" />
+    <article className="flex gap-[25px] flex-col w-[730px] min-h-[167px] bg-[#FFFFFF] p-[24px] rounded-[8px]">
+      <div className="flex gap-[25px]">
+        <div className="hidden sm:flex">
+          <Score score={data.score} />
         </div>
-
-        <p>
-          Impressive! Though it seems the drag feature could be improved. But
-          overall it looks incredible. You’ve nailed the design and the
-          responsiveness at various breakpoints works really well.
-        </p>
+        <div className="flex flex-col gap-[20px]">
+          <CommentHeader
+            username={data.user.username}
+            createdAt={data.createdAt}
+            avatar={data.user.image.png}
+          />
+          <p className="text-[#67727E]">{data.content}</p>
+        </div>
       </div>
+      <CommentFooter />
     </article>
   );
 };

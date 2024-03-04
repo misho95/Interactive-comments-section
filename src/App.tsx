@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { useState } from "react";
 import dataJson from "./data.json";
 import Container from "./components/container";
 import Comment from "./components/comment";
@@ -31,8 +31,6 @@ export type CommentDataType = {
   }[];
 };
 
-export const ActiveContext = createContext<any>(null);
-
 const App = () => {
   const [commentsData, setCommentsData] = useState<CommentDataType[]>(
     dataJson.comments
@@ -40,7 +38,11 @@ const App = () => {
 
   return (
     <Container>
-      <Comment />
+      <div className="flex flex-col gap-[25px]">
+        {commentsData.map((comment) => {
+          return <Comment key={comment.id} data={comment} />;
+        })}
+      </div>
     </Container>
   );
 };
