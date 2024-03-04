@@ -26,7 +26,7 @@ export type CommentDataType = {
   }[];
 };
 
-const commentsData: CommentDataType[] = [
+const localCommentsData: CommentDataType[] = [
   {
     id: 1,
     likes: 12,
@@ -88,10 +88,46 @@ const user = {
 export const ActiveContext = createContext<any>(null);
 
 const App = () => {
+  const [commentsData, setCommentsData] =
+    useState<CommentDataType[]>(localCommentsData);
   const [activeReplay, setActiveReplay] = useState<null | number>(null);
+  const [commentInput, setCommentInput] = useState("");
+
+  const handleComment = () => {
+    const obj = {
+      id: Math.round(Math.random() * 10000),
+      likes: 0,
+      userId: user.id,
+      userName: user.userName,
+      date: "Now",
+      avatar: Avatar,
+      comment: commentInput,
+    };
+
+    setCommentsData([...commentsData, obj]);
+    setCommentInput("");
+  };
+
+  const handleDelete = (id: number) => {
+    const deleteComment = commentsData.filter((d) => {
+      if (d.id !== id) {
+        return d;
+      }
+      if (d.replay) {
+        d.replay.filter((r) => {
+          if (r.id !== id) {
+            return r;
+          }
+        });
+      }
+    });
+    setCommentsData(deleteComment);
+  };
 
   return (
-    <ActiveContext.Provider value={{ activeReplay, setActiveReplay, user }}>
+    <ActiveContext.Provider
+      value={{ activeReplay, setActiveReplay, user, handleDelete }}
+    >
       <div className="flex min-h-screen justify-center items-center bg-[#E9EBF0] py-6">
         <div className="w-11/12 md:w-[730px] flex flex-col gap-3 h-fit">
           {commentsData.map((com) => {
@@ -111,7 +147,12 @@ const App = () => {
               </div>
             );
           })}
-          <ReplayContainer title={"send"} />
+          <ReplayContainer
+            title={"send"}
+            value={commentInput}
+            set={setCommentInput}
+            handler={handleComment}
+          />
         </div>
       </div>
     </ActiveContext.Provider>

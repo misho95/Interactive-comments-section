@@ -1,9 +1,11 @@
-import { useContext, useState } from "react";
+import { memo, useContext, useState } from "react";
 import LikesCount from "./likes.count";
 import ReplayContainer from "./replay.container";
-import ReplyComment from "./reply.comment";
 import { ActiveContext } from "../App";
 import Reply from "../assets/Reply.png";
+import Delete from "../assets/delete-icon.png";
+import Edit from "../assets/edit-icon.png";
+import SharedButton from "./shared.button";
 
 type CommentType = {
   id: number;
@@ -24,7 +26,8 @@ type PropsType = {
 };
 
 const Comment = ({ data }: PropsType) => {
-  const { activeReplay, setActiveReplay, user } = useContext(ActiveContext);
+  const { activeReplay, setActiveReplay, user, handleDelete } =
+    useContext(ActiveContext);
 
   const handleSetActiveReply = () => {
     if (activeReplay === data.id) {
@@ -58,9 +61,17 @@ const Comment = ({ data }: PropsType) => {
             </div>
             <div className="hidden sm:flex">
               {user.id === data.userId ? (
-                <div>edit/delete</div>
+                <div className="flex gap-3">
+                  <SharedButton
+                    title={"Delete"}
+                    icon={Delete}
+                    onClick={() => handleDelete(data.id)}
+                    style={{ color: "#ED6368" }}
+                  />
+                  <SharedButton title={"Edit"} icon={Edit} onClick={() => {}} />
+                </div>
               ) : (
-                <ReplyComment
+                <SharedButton
                   title={"Reply"}
                   icon={Reply}
                   onClick={handleSetActiveReply}
@@ -77,9 +88,21 @@ const Comment = ({ data }: PropsType) => {
           <div className="flex sm:hidden justify-between">
             <LikesCount likes={localLikes} onChange={setLocalLikes} />
             {user.id === data.userId ? (
-              <div>edit/delete</div>
+              <div className="flex gap-3">
+                <SharedButton
+                  title={"Delete"}
+                  icon={Delete}
+                  onClick={() => {}}
+                  style={{ color: "#ED6368" }}
+                />
+                <SharedButton title={"Edit"} icon={Edit} onClick={() => {}} />
+              </div>
             ) : (
-              <ReplyComment onClick={handleSetActiveReply} />
+              <SharedButton
+                title={"Reply"}
+                icon={Reply}
+                onClick={handleSetActiveReply}
+              />
             )}
           </div>
         </div>
