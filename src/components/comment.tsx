@@ -12,7 +12,7 @@ interface CommentOrReply extends CommentDataType {
 type PropsType = {
   data: CommentOrReply;
   reply?: boolean;
-  handleReplyMessage: (id: number, message: string) => void;
+  handleReplyMessage: (id: number, message: string, reply: boolean) => void;
 };
 
 const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
@@ -20,15 +20,16 @@ const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
   if (!globalContext) {
     return;
   }
-  const { replyActive } = globalContext;
+  const { replyActive, setReplyActive } = globalContext;
 
   const [localScore, setLocalScore] = useState<number>(data.score);
 
   const [replyMessage, setReplyMessage] = useState("");
 
   const handleReply = () => {
-    handleReplyMessage(data.id, replyMessage);
+    handleReplyMessage(data.id, replyMessage, reply);
     setReplyMessage("");
+    setReplyActive(null);
   };
 
   return (
@@ -79,7 +80,7 @@ const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
                 key={replie.id}
                 data={replie}
                 reply
-                handleReplyMessage={handleReply}
+                handleReplyMessage={handleReplyMessage}
               />
             );
           })}

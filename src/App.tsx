@@ -32,6 +32,7 @@ export type ReplyType = {
     };
     username: string;
   };
+  replies?: ReplyType[];
 };
 
 type GlobalContextType = {
@@ -73,47 +74,110 @@ const App = () => {
     setMessage("");
   };
 
-  const handleReplyMessage = (id: number, message: string) => {
-    const findComment = commentsData.find((com) => {
-      if (com.id === id) {
-        return com;
+  const handleReplyMessage = (id: number, message: string, reply: boolean) => {
+    if (!reply) {
+      const findComment = commentsData.find((com) => {
+        if (com.id === id) {
+          return com;
+        }
+      });
+
+      if (!findComment) {
+        return;
       }
-    });
 
-    if (!findComment) {
-      return;
-    }
-
-    const obj = {
-      id: Math.round(Math.random() * 1000),
-      content: message,
-      createdAt: "now",
-      score: 0,
-      replyingTo: findComment?.user.username,
-      user: {
-        image: {
-          png: user.image.png,
-          webp: user.image.webp,
+      const obj = {
+        id: Math.round(Math.random() * 1000),
+        content: message,
+        createdAt: "now",
+        score: 0,
+        replyingTo: findComment?.user.username,
+        user: {
+          image: {
+            png: user.image.png,
+            webp: user.image.webp,
+          },
+          username: user.username,
         },
-        username: user.username,
-      },
-    };
+      };
 
-    const updateComments = commentsData.map((com) => {
-      if (id === com.id) {
-        return {
-          ...com,
-          replies:
-            com.replies && com.replies?.length > 0
-              ? [...com.replies, obj]
-              : [obj],
+      const updateComments = commentsData.map((com) => {
+        if (id === com.id) {
+          return {
+            ...com,
+            replies:
+              com.replies && com.replies?.length > 0
+                ? [...com.replies, obj]
+                : [obj],
+          };
+        } else {
+          return com;
+        }
+      });
+
+      setCommentsData(updateComments);
+    } else {
+      const replies = findReplies(id);
+      if (replies) {
+        const { parentId, reply } = replies;
+
+        const findComment = commentsData.find((com) => {
+          if (com.id === parentId) {
+            return com;
+          }
+        });
+
+        if (!findComment) {
+          return;
+        }
+
+        const obj = {
+          id: Math.round(Math.random() * 1000),
+          content: message,
+          createdAt: "now",
+          score: 0,
+          replyingTo: reply.user.username,
+          user: {
+            image: {
+              png: user.image.png,
+              webp: user.image.webp,
+            },
+            username: user.username,
+          },
         };
-      } else {
-        return com;
-      }
-    });
 
-    setCommentsData(updateComments);
+        const updateComments = commentsData.map((com) => {
+          if (com.id === parentId) {
+            return {
+              ...com,
+              replies:
+                com.replies && com.replies?.length > 0
+                  ? [...com.replies, obj]
+                  : [obj],
+            };
+          } else {
+            return com;
+          }
+        });
+
+        setCommentsData(updateComments);
+      }
+      //
+    }
+  };
+
+  const findReplies = (id: number) => {
+    for (const comment of commentsData) {
+      // Check if replies exist and is an array
+      if (comment.replies && Array.isArray(comment.replies)) {
+        for (const reply of comment.replies) {
+          if (reply.id === id) {
+            return { parentId: comment.id, reply: reply };
+          }
+        }
+      }
+    }
+    return null;
   };
 
   return (
