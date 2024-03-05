@@ -38,6 +38,8 @@ export type ReplyType = {
 type GlobalContextType = {
   replyActive: null | number;
   setReplyActive: (arg: number | null) => void;
+  handleReplyMessage: (id: number, message: string, reply: boolean) => void;
+  handleDelete: (id: number, reply: boolean) => void;
 };
 
 export const UserContext = createContext(dataJson.currentUser);
@@ -53,6 +55,20 @@ const App = () => {
   const [replyActive, setReplyActive] = useState<null | number>(null);
 
   const [message, setMessage] = useState("");
+
+  const findReplies = (id: number) => {
+    for (const comment of commentsData) {
+      // Check if replies exist and is an array
+      if (comment.replies && Array.isArray(comment.replies)) {
+        for (const reply of comment.replies) {
+          if (reply.id === id) {
+            return { parentId: comment.id, reply: reply };
+          }
+        }
+      }
+    }
+    return null;
+  };
 
   const sendMessage = () => {
     const obj = {
@@ -166,33 +182,54 @@ const App = () => {
     }
   };
 
-  const findReplies = (id: number) => {
-    for (const comment of commentsData) {
-      // Check if replies exist and is an array
-      if (comment.replies && Array.isArray(comment.replies)) {
-        for (const reply of comment.replies) {
-          if (reply.id === id) {
-            return { parentId: comment.id, reply: reply };
+  const handleDelete = (id: number, reply: boolean) => {
+    if (reply) {
+      const replyData = findReplies(id);
+      if (replyData) {
+        const { parentId, reply } = replyData;
+
+        const updateComments = commentsData.map((com) => {
+          if (com.id === parentId) {
+            return {
+              ...com,
+              replies: com.replies?.filter((r) => {
+                if (r.id !== id) {
+                  return r;
+                }
+              }),
+            };
+          } else {
+            return com;
           }
-        }
+        });
+
+        setCommentsData(updateComments);
       }
+    } else {
+      const updateComments = commentsData.filter((com) => {
+        if (com.id !== id) {
+          return com;
+        }
+      });
+
+      setCommentsData(updateComments);
     }
-    return null;
   };
 
   return (
     <Container>
       <UserContext.Provider value={user}>
-        <GlobalContext.Provider value={{ replyActive, setReplyActive }}>
+        <GlobalContext.Provider
+          value={{
+            replyActive,
+            setReplyActive,
+            handleReplyMessage,
+            handleDelete,
+          }}
+        >
           <div className="flex flex-col gap-[25px] w-11/12 sm:w-fit items-center py-[20px]">
             {commentsData.map((comment) => {
-              return (
-                <Comment
-                  key={comment.id}
-                  data={comment}
-                  handleReplyMessage={handleReplyMessage}
-                />
-              );
+              return <Comment key={comment.id} data={comment} />;
             })}
             <ReplyContainer
               title={"send"}

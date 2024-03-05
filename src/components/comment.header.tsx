@@ -4,19 +4,26 @@ import { GlobalContext, UserContext } from "../App";
 
 type PropsType = {
   id: number;
+  reply: boolean;
   username: string;
   createdAt: string;
   avatar: string;
 };
 
-const CommentHeader = ({ id, username, createdAt, avatar }: PropsType) => {
+const CommentHeader = ({
+  id,
+  reply,
+  username,
+  createdAt,
+  avatar,
+}: PropsType) => {
   const user = useContext(UserContext);
   const globalContext = useContext(GlobalContext);
   if (!globalContext) {
     return;
   }
 
-  const { replyActive, setReplyActive } = globalContext;
+  const { replyActive, setReplyActive, handleDelete } = globalContext;
 
   const replyHandler = () => {
     if (replyActive === id) {
@@ -37,7 +44,10 @@ const CommentHeader = ({ id, username, createdAt, avatar }: PropsType) => {
       <div className="hidden sm:flex gap-[25px]">
         {username === user.username ? (
           <>
-            <ActionButton type="delete" />
+            <ActionButton
+              type="delete"
+              handler={() => handleDelete(id, reply)}
+            />
             <ActionButton type="edit" />
           </>
         ) : (

@@ -12,15 +12,14 @@ interface CommentOrReply extends CommentDataType {
 type PropsType = {
   data: CommentOrReply;
   reply?: boolean;
-  handleReplyMessage: (id: number, message: string, reply: boolean) => void;
 };
 
-const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
+const Comment = ({ data, reply = false }: PropsType) => {
   const globalContext = useContext(GlobalContext);
   if (!globalContext) {
     return;
   }
-  const { replyActive, setReplyActive } = globalContext;
+  const { replyActive, setReplyActive, handleReplyMessage } = globalContext;
 
   const [localScore, setLocalScore] = useState<number>(data.score);
 
@@ -46,6 +45,7 @@ const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
           <div className="flex flex-col gap-[20px] w-full">
             <CommentHeader
               id={data.id}
+              reply={reply}
               username={data.user.username}
               createdAt={data.createdAt}
               avatar={data.user.image.png}
@@ -61,6 +61,8 @@ const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
           </div>
         </div>
         <CommentFooter
+          id={data.id}
+          reply={reply}
           username={data.user.username}
           score={{ localScore, setLocalScore }}
         />
@@ -73,16 +75,9 @@ const Comment = ({ data, reply = false, handleReplyMessage }: PropsType) => {
         />
       )}
       {data.replies && data.replies.length > 0 && (
-        <div className="flex flex-col border-l-2 pl-[43px] ml-[43px] border-[#E9EBF0] gap-[25px]">
+        <div className="flex flex-col border-l-2 pl-[15px] sm:pl-[43px] ml-[15px] sm:ml-[43px] border-[#E9EBF0] gap-[25px]">
           {data.replies.map((replie) => {
-            return (
-              <Comment
-                key={replie.id}
-                data={replie}
-                reply
-                handleReplyMessage={handleReplyMessage}
-              />
-            );
+            return <Comment key={replie.id} data={replie} reply />;
           })}
         </div>
       )}
