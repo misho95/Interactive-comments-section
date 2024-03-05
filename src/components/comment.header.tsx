@@ -1,13 +1,31 @@
+import { useContext } from "react";
 import ActionButton from "./action.button";
+import { GlobalContext, UserContext } from "../App";
 
 type PropsType = {
+  id: number;
   username: string;
   createdAt: string;
   avatar: string;
 };
 
-const CommentHeader = ({ username, createdAt, avatar }: PropsType) => {
-  const owner = true;
+const CommentHeader = ({ id, username, createdAt, avatar }: PropsType) => {
+  const user = useContext(UserContext);
+  const globalContext = useContext(GlobalContext);
+  if (!globalContext) {
+    return;
+  }
+
+  const { replyActive, setReplyActive } = globalContext;
+
+  const replyHandler = () => {
+    if (replyActive === id) {
+      setReplyActive(null);
+      return;
+    }
+
+    setReplyActive(id);
+  };
 
   return (
     <div className="w-full flex justify-between">
@@ -17,13 +35,13 @@ const CommentHeader = ({ username, createdAt, avatar }: PropsType) => {
         <span className="text-[#67727E]">{createdAt}</span>
       </div>
       <div className="hidden sm:flex gap-[25px]">
-        {owner ? (
+        {username === user.username ? (
           <>
             <ActionButton type="delete" />
             <ActionButton type="edit" />
           </>
         ) : (
-          <ActionButton type="reply" />
+          <ActionButton type="reply" handler={replyHandler} />
         )}
       </div>
     </div>
