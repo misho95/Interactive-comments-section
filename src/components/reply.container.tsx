@@ -21,7 +21,7 @@ const ReplyContainer = ({ title, buttonHandler, content }: PropsType) => {
         <textarea
           value={content.value}
           onChange={(e) => content.onChange(e.target.value)}
-          className="w-full h-[96px] p-[17px] border-[1px] border-[#E9EBF0] rounded-[8px] resize-none focus:outline-none text-[#67727E]"
+          className="w-full h-[96px] p-[17px] border-[1px] border-[#E9EBF0] rounded-[8px] resize-none focus:outline-[#5357B6] text-[#67727E]"
           placeholder="Add a comment…"
         />
         <Button title={title} handler={buttonHandler} />
@@ -30,7 +30,7 @@ const ReplyContainer = ({ title, buttonHandler, content }: PropsType) => {
         <textarea
           value={content.value}
           onChange={(e) => content.onChange(e.target.value)}
-          className="w-full h-[96px] p-[17px] border-[1px] border-[#E9EBF0] rounded-[8px] resize-none focus:outline-none text-[#67727E]"
+          className="w-full h-[96px] p-[17px] border-[1px] border-[#E9EBF0] rounded-[8px] resize-none focus:outline-[#5357B6] text-[#67727E]"
           placeholder="Add a comment…"
         />
         <div className="flex justify-between items-center">

@@ -40,6 +40,9 @@ type GlobalContextType = {
   setReplyActive: (arg: number | null) => void;
   handleReplyMessage: (id: number, message: string, reply: boolean) => void;
   handleDelete: (id: number, reply: boolean) => void;
+  activeEdit: null | number;
+  setActiveEdit: (arg: null | number) => void;
+  handleEdit: (id: number, message: string, reply: boolean) => void;
 };
 
 export const UserContext = createContext(dataJson.currentUser);
@@ -53,6 +56,7 @@ const App = () => {
   );
 
   const [replyActive, setReplyActive] = useState<null | number>(null);
+  const [activeEdit, setActiveEdit] = useState<null | number>(null);
 
   const [message, setMessage] = useState("");
 
@@ -186,7 +190,7 @@ const App = () => {
     if (reply) {
       const replyData = findReplies(id);
       if (replyData) {
-        const { parentId, reply } = replyData;
+        const { parentId } = replyData;
 
         const updateComments = commentsData.map((com) => {
           if (com.id === parentId) {
@@ -216,6 +220,54 @@ const App = () => {
     }
   };
 
+  const handleEdit = (id: number, message: string, reply: boolean) => {
+    if (reply) {
+      const replyData = findReplies(id);
+      if (replyData) {
+        const { parentId, reply } = replyData;
+        const newObj = {
+          ...reply,
+          content: message,
+        };
+        const updateComments = commentsData.map((com) => {
+          if (com.id === parentId) {
+            return {
+              ...com,
+              replies: com.replies
+                ? com.replies.map((r) => {
+                    if (r.id === id) {
+                      return newObj;
+                    } else {
+                      return r;
+                    }
+                  })
+                : [],
+            };
+          } else {
+            return com;
+          }
+        });
+
+        setCommentsData(updateComments);
+        setActiveEdit(null);
+      }
+    } else {
+      const updateComments = commentsData.map((com) => {
+        if (com.id === id) {
+          return {
+            ...com,
+            content: message,
+          };
+        } else {
+          return com;
+        }
+      });
+
+      setCommentsData(updateComments);
+      setActiveEdit(null);
+    }
+  };
+
   return (
     <Container>
       <UserContext.Provider value={user}>
@@ -225,6 +277,9 @@ const App = () => {
             setReplyActive,
             handleReplyMessage,
             handleDelete,
+            activeEdit,
+            setActiveEdit,
+            handleEdit,
           }}
         >
           <div className="flex flex-col gap-[25px] w-11/12 sm:w-fit items-center py-[20px]">

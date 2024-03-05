@@ -1,9 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CommentDataType, GlobalContext } from "../App";
 import CommentFooter from "./comment.footer";
 import CommentHeader from "./comment.header";
 import Score from "./score";
 import ReplyContainer from "./reply.container";
+import Button from "./button";
 
 interface CommentOrReply extends CommentDataType {
   replyingTo?: string;
@@ -19,9 +20,17 @@ const Comment = ({ data, reply = false }: PropsType) => {
   if (!globalContext) {
     return;
   }
-  const { replyActive, setReplyActive, handleReplyMessage } = globalContext;
+  const {
+    replyActive,
+    setReplyActive,
+    handleReplyMessage,
+    activeEdit,
+    handleEdit,
+  } = globalContext;
 
   const [localScore, setLocalScore] = useState<number>(data.score);
+
+  const [editInput, setEditInput] = useState("");
 
   const [replyMessage, setReplyMessage] = useState("");
 
@@ -31,6 +40,9 @@ const Comment = ({ data, reply = false }: PropsType) => {
     setReplyActive(null);
   };
 
+  useEffect(() => {
+    setEditInput(data.content);
+  }, [activeEdit]);
   return (
     <div
       className={`w-full  ${
@@ -50,14 +62,28 @@ const Comment = ({ data, reply = false }: PropsType) => {
               createdAt={data.createdAt}
               avatar={data.user.image.png}
             />
-            <p className="text-[#67727E]">
-              {reply && (
-                <span className="text-[#5357B6] text-[16px] pr-[10px] select-all">
-                  @{data.replyingTo}
-                </span>
-              )}
-              <span>{data.content}</span>
-            </p>
+            {activeEdit === data.id ? (
+              <div className="flex flex-col gap-[25px] items-end">
+                <textarea
+                  value={editInput}
+                  onChange={(e) => setEditInput(e.target.value)}
+                  className="w-full h-[96px] p-[17px] border-[1px] border-[#E9EBF0] rounded-[8px] resize-none focus:outline-[#5357B6] text-[#67727E]"
+                />
+                <Button
+                  title="update"
+                  handler={() => handleEdit(data.id, editInput, reply)}
+                />
+              </div>
+            ) : (
+              <p className="text-[#67727E]">
+                {reply && (
+                  <span className="text-[#5357B6] text-[16px] pr-[10px] select-all">
+                    @{data.replyingTo}
+                  </span>
+                )}
+                <span>{data.content}</span>
+              </p>
+            )}
           </div>
         </div>
         <CommentFooter

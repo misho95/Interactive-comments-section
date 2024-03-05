@@ -1,7 +1,8 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import ActionButton from "./action.button";
 import Score from "./score";
 import { GlobalContext, UserContext } from "../App";
+import DeleteModal from "./delete.modal";
 
 type PropsType = {
   id: number;
@@ -14,6 +15,7 @@ type PropsType = {
 };
 
 const CommentFooter = ({ id, reply, username, score }: PropsType) => {
+  const [show, setShow] = useState(false);
   const user = useContext(UserContext);
 
   const globalContext = useContext(GlobalContext);
@@ -21,7 +23,13 @@ const CommentFooter = ({ id, reply, username, score }: PropsType) => {
     return;
   }
 
-  const { replyActive, setReplyActive, handleDelete } = globalContext;
+  const {
+    replyActive,
+    setReplyActive,
+    handleDelete,
+    activeEdit,
+    setActiveEdit,
+  } = globalContext;
 
   const replyHandler = () => {
     if (replyActive === id) {
@@ -32,18 +40,35 @@ const CommentFooter = ({ id, reply, username, score }: PropsType) => {
     setReplyActive(id);
   };
 
+  const editHandler = () => {
+    if (activeEdit === id) {
+      setActiveEdit(null);
+      return;
+    }
+
+    setActiveEdit(id);
+  };
+
   return (
-    <div className="flex justify-between items-center gap-[25px] sm:hidden">
-      <Score score={score} />
-      {user.username === username ? (
-        <div className="flex gap-[18px]">
-          <ActionButton type="delete" handler={() => handleDelete(id, reply)} />
-          <ActionButton type="edit" />
-        </div>
-      ) : (
-        <ActionButton type="reply" handler={replyHandler} />
+    <>
+      {show && (
+        <DeleteModal
+          hide={() => setShow(false)}
+          handler={() => handleDelete(id, reply)}
+        />
       )}
-    </div>
+      <div className="flex justify-between items-center gap-[25px] sm:hidden">
+        <Score score={score} />
+        {user.username === username ? (
+          <div className="flex gap-[18px]">
+            <ActionButton type="delete" handler={() => setShow(true)} />
+            <ActionButton type="edit" handler={editHandler} />
+          </div>
+        ) : (
+          <ActionButton type="reply" handler={replyHandler} />
+        )}
+      </div>
+    </>
   );
 };
 
