@@ -75,6 +75,10 @@ const App = () => {
   };
 
   const sendMessage = () => {
+    if (!message) {
+      return;
+    }
+
     const obj = {
       id: Math.round(Math.random() * 1000),
       content: message,
@@ -95,6 +99,9 @@ const App = () => {
   };
 
   const handleReplyMessage = (id: number, message: string, reply: boolean) => {
+    if (!message) {
+      return;
+    }
     if (!reply) {
       const findComment = commentsData.find((com) => {
         if (com.id === id) {
