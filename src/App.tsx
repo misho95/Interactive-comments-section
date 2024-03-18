@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import dataJson from "./data.json";
 import Container from "./components/container";
 import Comment from "./components/comment";
@@ -275,6 +275,15 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
+    }, 50);
+  }, []);
+
   return (
     <Container>
       <UserContext.Provider value={user}>
@@ -297,6 +306,7 @@ const App = () => {
               title={"send"}
               buttonHandler={sendMessage}
               content={{ value: message, onChange: setMessage }}
+              reply={false}
             />
           </div>
         </GlobalContext.Provider>

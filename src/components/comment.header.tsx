@@ -1,37 +1,24 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import ActionButton from "./action.button";
 import { GlobalContext, UserContext } from "../App";
-import DeleteModal from "./delete.modal";
+import { ModalContext } from "./comment";
 
 type PropsType = {
   id: number;
-  reply: boolean;
   username: string;
   createdAt: string;
   avatar: string;
 };
 
-const CommentHeader = ({
-  id,
-  reply,
-  username,
-  createdAt,
-  avatar,
-}: PropsType) => {
-  const [show, setShow] = useState(false);
+const CommentHeader = ({ id, username, createdAt, avatar }: PropsType) => {
   const user = useContext(UserContext);
   const globalContext = useContext(GlobalContext);
   if (!globalContext) {
     return;
   }
 
-  const {
-    replyActive,
-    setReplyActive,
-    handleDelete,
-    activeEdit,
-    setActiveEdit,
-  } = globalContext;
+  const { replyActive, setReplyActive, activeEdit, setActiveEdit } =
+    globalContext;
 
   const replyHandler = () => {
     if (replyActive === id) {
@@ -51,14 +38,10 @@ const CommentHeader = ({
     setActiveEdit(id);
   };
 
+  const { setShowModal } = useContext(ModalContext);
+
   return (
     <>
-      {show && (
-        <DeleteModal
-          hide={() => setShow(false)}
-          handler={() => handleDelete(id, reply)}
-        />
-      )}
       <div className="w-full flex justify-between">
         <div className="flex items-center gap-[10px]">
           <img src={avatar} className="size-[32px]" />
@@ -68,7 +51,7 @@ const CommentHeader = ({
         <div className="hidden sm:flex gap-[25px]">
           {username === user.username ? (
             <>
-              <ActionButton type="delete" handler={() => setShow(true)} />
+              <ActionButton type="delete" handler={() => setShowModal(true)} />
               <ActionButton type="edit" handler={editHandler} />
             </>
           ) : (

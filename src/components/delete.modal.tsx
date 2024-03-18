@@ -1,11 +1,13 @@
+import { createPortal } from "react-dom";
+
 type PropsType = {
   hide: () => void;
   handler: () => void;
 };
 
 const DeleteModal = ({ hide, handler }: PropsType) => {
-  return (
-    <div className="bg-black/50 fixed top-0 left-0 w-full min-h-screen flex justify-center items-center">
+  return createPortal(
+    <div className="bg-black/50 fixed top-0 left-0 w-full min-h-screen flex justify-center items-center z-50">
       <div className="bg-white w-11/12 sm:w-[400px] h-fit rounded-[8px] flex flex-col gap-[25px] p-[37px]">
         <h1 className="text-[24px] text-[#334253]">Delete comment</h1>
         <p className="text-[#67727E]">
@@ -27,7 +29,8 @@ const DeleteModal = ({ hide, handler }: PropsType) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
