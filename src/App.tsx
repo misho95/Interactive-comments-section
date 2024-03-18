@@ -96,6 +96,10 @@ const App = () => {
 
     setCommentsData([...commentsData, obj]);
     setMessage("");
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    });
   };
 
   const handleReplyMessage = (id: number, message: string, reply: boolean) => {
